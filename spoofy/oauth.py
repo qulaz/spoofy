@@ -1,5 +1,6 @@
 import aiohttp, asyncio, json, logging
 from urllib.parse import urlencode, urlparse, parse_qs
+from base64 import b64encode
 
 from .exceptions import SpoofyException, AuthenticationError
 
@@ -97,6 +98,44 @@ class OAuth:
 
 			if callable(self.on_update[0]):
 				self.on_update[0](self.on_update[1], self._access_token, self._refresh_token)
+
+
+class ClientCredentialsFlow:
+	'''Implements the Client Credentials Flow method. '''
+
+	TOKEN_URL = 'https://accounts.spotify.com/api/token'
+	_access_token = None
+
+	def __init__(self, client_id: str, client_secret: str, loop=None):
+		self.client_id = client_id
+		self.client_secret = client_secret
+
+		self.session = aiohttp.ClientSession(loop=loop or asyncio.get_event_loop())
+
+	@property
+	def access_token(self):
+		if self._access_token is None:
+			raise AuthenticationError('Access token non-existent, authenticate first!')
+		return self._access_token
+
+	async def refresh(self):
+		token = b64encode(":".join((self.client_id, self.client_secret)).encode())
+
+		data = {"grant_type": "client_credentials"}
+		headers = {"Authorization": f"Basic {token.decode()}"}
+
+		async with self.session.post(
+				"https://accounts.spotify.com/api/token", data=data, headers=headers
+		) as resp:
+			data = json.loads(await resp.text())
+
+			if resp.status != 200:
+				raise AuthenticationError(resp)
+
+			self._access_token = data['access_token']
+
+	async def get_tokens(self):
+		await self.refresh()
 
 
 def on_update_func(cache_file, access_token, refresh_token):

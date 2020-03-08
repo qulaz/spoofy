@@ -5,6 +5,7 @@ import json as jsonserial
 from pprint import pprint
 
 from .exceptions import *
+from .oauth import ClientCredentialsFlow
 
 log = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class HTTP:
 				if resp.status == 400:
 					raise BadRequest(resp, error)
 				elif resp.status == 401:
-					if error == 'The access token expired':
+					if error == 'The access token expired' or isinstance(self.auth, ClientCredentialsFlow):
 						await self.auth.refresh()
 						return await self.request(req, attempt + 1)
 					else:
