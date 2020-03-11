@@ -26,5 +26,4 @@ from .device import Device
 from .playing import CurrentlyPlaying, CurrentlyPlayingContext
 
 log = logging.getLogger(__name__)
-log.setLevel(logging.DEBUG)
 # log.addHandler(StreamHandler())

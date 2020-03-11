@@ -50,7 +50,10 @@ class HTTP:
 
 			# stop new requests if a previous one caused a 429 which is still being awaited
 			if self.lock.is_set():
-				print('stopped!')
+				log.warning(
+					"Request was paused because previous one get a 429 Many Requests. "
+					"Request will continue after some sleep"
+				)
 				await self.lock.wait()
 
 			async with self.session.request(req.method, req.url, params=req.params, data=req.data, json=req.json,
