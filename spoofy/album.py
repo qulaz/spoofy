@@ -97,9 +97,9 @@ class FullAlbum(Album, ExternalIDMixin):
 	def __init__(self, client, data):
 		super().__init__(client, data)
 
-		self.genres = data.pop('genres')
-		self.label = data.pop('label')
-		self.popularity = data.pop('popularity')
-		self.copyrights = data.pop('copyrights')
+		self.genres = data.get('genres')
+		self.label = data.get('label')
+		self.popularity = data.get('popularity')
+		self.copyrights = data.get('copyrights')
 
-		self._fill_external_ids(data.pop('external_ids'))
+		self._fill_external_ids(data.get('external_ids'))

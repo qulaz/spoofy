@@ -25,7 +25,7 @@ class Track(Object, ExternalURLMixin, ArtistMixin):
 		Spotify URL of the album.
 	type: str
 		Plaintext string of object type: ``track``.
-	available_markets: List[str] or None
+	available_markets: List[str]
 		Markets where the album is available: `ISO_3166-1 <https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2>`_.
 	disc_number: int
 		What disc the track appears on. Usually ``1`` unless there are several discs in the album.
@@ -42,7 +42,7 @@ class Track(Object, ExternalURLMixin, ArtistMixin):
 	restrictions: restrictions object
 		tbc
 	preview_url: str
-		An URL to a 30 second preview (MP3) of the track.
+		An URL to a 30 second preview (MP3) of the track. Can be null
 	track_number: int
 		The number of the track on the album.
 	is_local: bool
@@ -54,12 +54,12 @@ class Track(Object, ExternalURLMixin, ArtistMixin):
 	def __init__(self, client, data):
 		super().__init__(client, data)
 
-		self.available_markets = data.pop('available_markets', None)
-		self.disc_number = data.pop('disc_number')
-		self.explicit = data.pop('explicit')
-		self.preview_url = data.pop('preview_url')
-		self.track_number = data.pop('track_number')
-		self.is_local = data.pop('is_local')
+		self.available_markets = data.pop('available_markets', [])
+		self.disc_number = data.get('disc_number')
+		self.explicit = data.get('explicit')
+		self.preview_url = data.get('preview_url')
+		self.track_number = data.get('track_number')
+		self.is_local = data.get('is_local')
 
 		self.duration = timedelta(milliseconds=data.pop('duration_ms'))
 
